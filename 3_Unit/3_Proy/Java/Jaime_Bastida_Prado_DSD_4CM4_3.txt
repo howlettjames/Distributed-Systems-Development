@@ -1,0 +1,225 @@
+----------------------------------------------------Graficador.java-------------------------------------------------------
+// Profesor, buenos días/tardes/noches, el programa de graficación esta hecho utilizando JavaFX, espero no haya algún inconveniente
+// le mandé mensaje por Moodle preguntándole acerca de eso, pero no obtuve respuesta. Me gustaría que tuviese
+// más contacto con nosotros, por ejemplo, para el Proyecto 2 y las prácticas que ha ido dejando, también tuve dudas pero nunca me contestó
+// incluso le mandé mensaje por medio de otro compañero de mi equipo y tampoco. Una clase de videollamada resolviendo dudas estaría bien
+// y hablando con otros compañeros también tienen la misma queja.
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Orientation;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.List;
+import java.util.ArrayList;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.LineChart;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+import java.io.*;
+import java.net.*;
+import java.nio.ByteBuffer; //Para manejo de ByteBuffer
+import java.nio.ByteOrder;
+		
+public class Graficador extends Application
+{
+	// OBJETOS DE JAVAFX QUE SE VISUALIZARÁN EN EL STAGE
+	private XYChart.Series<Number, Number> serieFourier1;     
+	private XYChart.Series<Number, Number> serieFourier2;     
+	NumberAxis xAxis = new NumberAxis(-7, 7, 1);
+    NumberAxis yAxis = new NumberAxis(-7, 7, 1);      
+    LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
+
+    // VARIABLES PARA ALMACENAR LAS COORDINADAS ENVIADAS POR EL PROGRAMA EN C++
+    public double[] xPoints = null;
+	public double[] yPoints = null;
+	public int numberOfCoordinates = 0;
+
+	// VARIABLE PARA MANEJO DE LA COMUNICACIÓN MEDIANTE PROTOCOLO UDP
+	public DatagramSocket sock = null;
+	public int serverPort = 7200;
+    public InetAddress clientAddress = null;	
+    public int clientPort = 0;
+    
+	@Override
+	public void start(Stage primaryStage)
+	{
+		// PANEL PRINCIPAL EN EL QUE SE DESPLEGARÁ EL LINECHART
+		VBox fourierPane = new VBox(20);
+		
+		// PONEMOS LAS ETIQUETAS PARA LOS EJES Y LA PROPIEDAD DE QUE SE AUTOCENTREN CADA QUE CAMBIEN LAS COORDENADAS
+        xAxis.setLabel("t");                
+        yAxis.setLabel("f(t)");
+        
+        // COLOCAMOS PADDING AL PANEL
+        fourierPane.setPadding(new Insets(150, 5, 5, 5));
+        
+        // QUITAMOS LOS PEQUEÑOS CIRCULOS QUE SE DIBUJAN POR DEFAULT EN CADA PUNTO, PARA QUE SE VEA MÁS COMO UNA LÍNEA
+        lineChart.setCreateSymbols(false);
+
+		try
+		{	
+			// INTENTAMOS CREAR EL SOCKET		
+			sock = new DatagramSocket(serverPort);		
+			// ASIGNANDO MEMORIA PARA RECIBIR LAS COORDENADAS
+			byte[] bufferParaCoordenadas = new byte[65536];
+			// CREANDO DATAGRAMA DEL TAMAÑO DEL BUFFER
+			DatagramPacket paqueteConNumeroDeCoordenadas = new DatagramPacket(bufferParaCoordenadas, bufferParaCoordenadas.length);
+
+			// RECIBIMOS LAS COORDENADAS DENTRO DEL PAQUETE
+			System.out.println("Waiting for coordinates...");
+			sock.receive(paqueteConNumeroDeCoordenadas);
+
+			// OBTENEMOS LA IP Y PUERTO DE QUIEN ENVÍA LAS COORDENADAS PARA POSTERIOR COMUNICACIÓN
+			clientAddress = paqueteConNumeroDeCoordenadas.getAddress();
+			clientPort = paqueteConNumeroDeCoordenadas.getPort();
+
+			// ENVOLVEMOS EL BUFFER EN UN BYTEBUFFER PARA HACER MÁS CÓMODA LA LECTURA DE LOS DATOS
+			ByteBuffer bufferConCoordenadas = ByteBuffer.wrap(bufferParaCoordenadas);
+			// ESPECIFICAMOS EL ORDEN LITTLE_ENDIAN PARA LA CORRECTA INTERPRETACIÓN DE LOS DATOS
+			bufferConCoordenadas.order(ByteOrder.LITTLE_ENDIAN);
+
+			// LEEMOS LA CANTIDAD DE COORDINADAS (RESOLUCIÓN) QUE EL SE ENVIARÁN Y RESERVAMOS MEMORIA EN AMBOS ARREGLOS, 
+			// EL DE EJE X ADEMÁS DEL EJE Y
+			numberOfCoordinates = bufferConCoordenadas.getInt();	
+			xPoints = new double[numberOfCoordinates];
+			yPoints = new double[numberOfCoordinates];
+
+			// RECIBIMOS LAS COORDENADAS DENTRO DEL PAQUETE
+			bufferConCoordenadas.clear();
+			sock.receive(paqueteConNumeroDeCoordenadas); 	// Esta vez el paquete nos sirve para recibir las coordenadas como tal ya no el número
+
+			// LEYENDO EL NÚMERO DE COORDENADAS INDICADAS EN EL PRIMER MENSAJE RECIBIDO
+			for(int npoint = 0; npoint < numberOfCoordinates; npoint++)
+			{
+				xPoints[npoint] = bufferConCoordenadas.getDouble();
+				yPoints[npoint] = bufferConCoordenadas.getDouble();
+			}
+
+			// COLOCAMOS EL PRIMER TERMINO DE LA SERIE
+			serieFourier1 = new XYChart.Series<>();
+			serieFourier1.setName("Serie de Fourier 1");
+			serieFourier2 = new XYChart.Series<>();
+			serieFourier2.setName("Serie de Fourier 2");	
+			
+			// ASIGNANDO LOS VALORES CORRESPONDIENTES A LAS SERIES			
+			for(int npoint = 0; npoint < numberOfCoordinates; npoint++)
+			{
+				serieFourier1.getData().add(new XYChart.Data<>(xPoints[npoint], yPoints[npoint]));
+				serieFourier2.getData().add(new XYChart.Data<>(xPoints[npoint], yPoints[npoint]));	
+			}
+
+			// AÑADIMOS LA SERIE DE FOURIER AL LINECHART PARA SER DESPLEGADO
+	        lineChart.getData().add(serieFourier1);
+	        lineChart.getData().add(serieFourier2);			
+		}
+		catch(IOException e)
+		{
+			System.err.println("IOException " + e);
+		}
+
+		// AÑADIMOS EL LINECHART AL PANEL PRINCIPAL
+		fourierPane.getChildren().addAll(lineChart);
+        
+		// POR ÚLTIMO AÑADIMOS UN ESCENARIO QUE CONTENDRÁ AL PANEL PRINCIPAL Y QUE PONDREMOS EN EL STAGE PRINCIPAL
+		Scene scene = new Scene(fourierPane, 900, 700);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("GRAFICADOR SERIE DE FOURIER DE UNA SEÑAL PERIÓDICA");			
+		primaryStage.show();
+
+		// PROGRAMAMOS UN TIMELINE PARA QUE CADA SEGUNDO HAGA UNA ACTUALIZACIÓN DE LA SERIE DE FOURIER,
+		// PIDIENDO LAS NUEVAS COORDENADAS POR UDP AL PROGRAMA EN C++, Y HACIENDO LA CORRESPONDIENTE ACTUALIZACIÓN DE
+		// LAS SERIES Y EL CHART
+		Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() 
+		{
+		    @Override
+		    public void handle(ActionEvent event) 
+		    {
+		    	try
+				{
+					// ASIGNANDO MEMORIA PARA RECIBIR LAS COORDENADAS
+					byte[] bufferParaCoordenadas = new byte[22000];
+					// CREANDO DATAGRAMA DEL TAMAÑO DEL BUFFER
+					DatagramPacket paqueteConCoordenadas = new DatagramPacket(bufferParaCoordenadas, bufferParaCoordenadas.length);
+
+		            // AVISANDO QUE SE PUEDEN ENVIAR LAS SIGUIENTES COORDENADAS
+			        final ByteBuffer bufferParaAviso = ByteBuffer.allocate(8); 
+					bufferParaAviso.order(ByteOrder.LITTLE_ENDIAN);
+					bufferParaAviso.putInt(0);
+					DatagramPacket paqueteConAviso = new DatagramPacket(bufferParaAviso.array() , bufferParaAviso.limit(), clientAddress, clientPort);
+					sock.send(paqueteConAviso);
+			        
+					// RECIBIMOS LAS COORDENADAS DENTRO DEL PAQUETE PARA COORDENADAS
+					System.out.println("Waiting for coordinates...");
+					sock.receive(paqueteConCoordenadas);
+
+					// ENVOLVEMOS EL BUFFER EN UN BYTEBUFFER PARA HACER MÁS CÓMODA LA LECTURA DE LOS DATOS
+					ByteBuffer bufferConCoordenadas = ByteBuffer.wrap(bufferParaCoordenadas);
+					// ESPECIFICAMOS EL ORDEN LITTLE_ENDIAN PARA LA CORRECTA INTERPRETACIÓN DE LOS DATOS
+					bufferConCoordenadas.order(ByteOrder.LITTLE_ENDIAN);
+
+					// GUARDAMOS LAS COORDENADAS DEL TÉRMINO N ANTERIOR EN UNA NUEVA SERIE
+					serieFourier2 = new XYChart.Series<>();
+					serieFourier2.setName("Serie de Fourier 2");
+
+					// ASIGNANDO LOS VALORES DEL TÉRMINO ANTERIOR A LA SERIE			
+					for(int npoint = 0; npoint < numberOfCoordinates; npoint++)
+						serieFourier2.getData().add(new XYChart.Data<>(xPoints[npoint], yPoints[npoint]));	
+
+					// LEYENDO EL NÚMERO DE COORDENADAS INDICADAS EN EL PRIMER MENSAJE RECIBIDO, PARA EL NUEVO TÉRMINO DE LA SERIE
+					for(int npoint = 0; npoint < numberOfCoordinates; npoint++)
+					{
+						xPoints[npoint] = bufferConCoordenadas.getDouble();
+						yPoints[npoint] = bufferConCoordenadas.getDouble();
+					}	
+				}
+				catch(IOException e)
+				{
+					System.err.println("IOException " + e);
+				}
+				
+				// System.out.println("N: " + lineChart.getData().get(0).getData());
+	
+				// VACÍAMOS EL LINECHART PARA COLOCAR LAS NUEVAS SERIES
+				lineChart.getData().remove(0);
+				lineChart.getData().remove(0);
+				
+				// PREPARAMOS UNA NUEVA SERIE DE PUNTOS PARA LAS COORDENADAS DEL TÉRMINO QUE NOS ACABAN DE MANDAR
+				serieFourier1 = new XYChart.Series<>();
+				serieFourier1.setName("Serie de Fourier 1");	
+				
+				// ASIGNANDO LOS VALORES CORRESPONDIENTES A LA SERIE			
+				for(int npoint = 0; npoint < numberOfCoordinates; npoint++)
+				{
+					serieFourier1.getData().add(new XYChart.Data<>(xPoints[npoint], yPoints[npoint]));	
+				}
+
+		        // POR ÚLTIMO AGREGAMOS AMBAS SERIES DE PUNTOS AL CHART, LA SERIE CON EL TÉRMINO PASADO Y EL ACTUAL
+		        lineChart.getData().add(serieFourier1);
+		        lineChart.getData().add(serieFourier2);
+		    }
+		}));
+
+		// PONEMOS A CORRER EL HILO QUE ESTARÁ ACTUALIZANDO EL LINECHART
+		fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+		fiveSecondsWonder.play();
+	}	
+}

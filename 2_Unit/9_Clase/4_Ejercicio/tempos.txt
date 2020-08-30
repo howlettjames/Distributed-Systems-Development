@@ -1,0 +1,7 @@
+DD y DD: 35.500s
+RAM y RAM: 3m9.777s
+CPU y CPU: 19.229s
+DD y CPU: 19.741s
+DD y RAM: 38.965s
+CPU y RAM: 39.109s
+DD y CPU y RAM: 38.970s

@@ -1,0 +1,8 @@
+Books_DSD
+*.o
+*.out
+*.exe
+*.xlsx
+*.class
+*.zip
+*.gz

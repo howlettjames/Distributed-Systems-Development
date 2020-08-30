@@ -1,0 +1,495 @@
+***************************************1.1.1*******************************************ALGORITMO BABILONICO
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int num, i;
+	double s, root;
+
+	cout.setf(ios::fixed);
+	cout.setf(ios::showpoint);
+	cout.precision(4);
+
+	cout << "Enter the integer: ";
+	cin >> num;
+
+	s = static_cast<double>(num);
+	root = s / 2.0;
+
+	i = 0;
+	while(i < 10)
+	{
+		root = (root + (s / root)) / 2.0;
+		i++;
+	}
+
+	cout << "The root is: " << root << endl;
+
+	return 0;
+}
+***************************************1.1.2*******************************************CALCULA ALTURA A PARTIR DE TIEMPO DE CAÍDA
+#include <iostream>
+using namespace std;
+
+const double G = 9.8;
+
+int main()
+{
+	double time, vf, h;
+
+	cout << "Enter the time: ";	
+	cin >> time;
+
+	vf = G * time;
+	h = (vf * vf) / (2 * G);
+
+	cout << "The height is: " << h << "m" << endl;
+
+	return 0;
+}
+***************************************1.1.3*******************************************ENTERO EN SEGUNDOS A HH:MM:SS
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	
+	int seconds, minutes, hours;
+
+	cout << "Enter the seconds: ";
+	cin >> seconds;
+
+	minutes = seconds / 60;
+	seconds = seconds % 60;
+	hours = minutes / 60;
+	minutes = minutes % 60;
+
+	cout << "Hours: " << hours << ". Minutes: " << minutes << ". Seconds: " << seconds << endl;
+
+	return 0;
+}
+***************************************1.2.1*******************************************KELVIN.H
+#ifndef KELVIN_H_
+#define KELVIN_H_
+
+class Kelvin
+{
+	private:
+		double kelvin;
+
+ 	public:
+ 		Kelvin(double kelvinn = 0.0);
+ 		void setKelvin(double kelvinn);
+ 		void setFahrenheit(double fahrenheit);
+ 		void setCelsius(double celsius);
+ 		void printKelvin();
+ 		void printFahrenheit();
+ 		void printCelsius();
+};
+
+#endif
+----------------------------------------------------------------------------------------KELVIN.CPP
+#include <iostream>
+#include "Kelvin.h"
+
+using namespace std;
+
+Kelvin::Kelvin(double kelvinn)
+{
+	kelvin = kelvinn;
+}
+
+void Kelvin::setKelvin(double kelvinn)
+{
+	kelvin = kelvinn;
+	return;
+}
+
+void Kelvin::setFahrenheit(double fahrenheit)
+{
+	kelvin = (fahrenheit - 32.0) * 5.0/9.0 + 273.15;
+	return;
+}
+
+void Kelvin::setCelsius(double celsius)
+{
+	kelvin = celsius + 273.15;
+	return;
+}
+
+void Kelvin::printKelvin()
+{
+	cout << "Kelvin: " << kelvin << endl;
+	return;
+}
+
+void Kelvin::printFahrenheit()
+{
+	cout << "Fahrenheit: " << (kelvin - 273.15) * 9.0/5.0 + 32.0 << endl;
+	return;
+}
+
+void Kelvin::printCelsius()
+{
+	cout << "Celsius: " << (kelvin - 273.15) << endl;
+	return;
+}
+----------------------------------------------------------------------------------------KELVIN TEST
+#include <iostream>
+#include "Kelvin.h"
+
+using namespace std;
+
+int main()
+{
+	Kelvin k, f, c;
+
+	k.setKelvin(400.0);
+	f.setFahrenheit(400.0);
+	c.setCelsius(200.0);
+	
+	k.printKelvin();
+	k.printFahrenheit();
+	k.printCelsius();	
+}
+***************************************1.2.2*******************************************FRACCION.H
+#ifndef FRACCION_H_
+#define FRACCION_H_
+
+class Fraccion
+{
+	private:
+		int num;
+		int den;
+
+ 	public:
+ 		Fraccion(int numm = 0, int denn = 0);
+ 		void setNum(int numm);
+ 		void setDen(int denn);
+ 		double getDouble();
+ 		void minimized();
+};
+
+#endif
+----------------------------------------------------------------------------------------FRACCION.CPP
+#include <iostream>
+#include "Fraccion.h"
+
+using namespace std;
+
+Fraccion::Fraccion(int numm, int denn)
+{
+	num = numm;
+	den = denn;
+}
+
+void Fraccion::setNum(int numm)
+{
+	num = numm;
+	return;
+}
+
+void Fraccion::setDen(int denn)
+{
+	den = denn;
+	return;
+}
+
+double Fraccion::getDouble()
+{
+	return static_cast<double>(num) / static_cast<double>(den);
+}
+
+void Fraccion::minimized()
+{
+	int quotient, remainder, divisor, dividend, mcf;
+
+	divisor = den;
+	dividend = num;
+	quotient = 0;
+	remainder = 0;
+	do
+	{
+		quotient = dividend / divisor;
+		remainder = dividend % divisor;
+		dividend = divisor;
+		divisor = remainder;
+	}
+	while(remainder != 0);
+
+	mcf = dividend;
+	printf("%d/%d = %d/%d\n", num, den, num / mcf, den / mcf);
+}
+----------------------------------------------------------------------------------------FRACCION TEST
+#include <iostream>
+#include "Fraccion.h"
+
+using namespace std;
+
+int main()
+{
+	Fraccion f;
+
+	f.setNum(45);
+	f.setDen(75);
+	cout << "Fraction: " << f.getDouble() << endl;
+	f.minimized();
+}
+									  ORTOEDRO
+***************************************1.4.1*******************************************COORDENADA.H
+#include <iostream>
+using namespace std;
+
+class Coordenada
+{
+	private:
+		double x;
+		double y;
+		double z;
+
+	public:
+		Coordenada(double = 0, double = 0, double = 0);
+		double obtenerX();
+		double obtenerY();
+		double obtenerZ();
+};
+---------------------------------------------------------------------------------------COORDENADA.CPP
+#include <iostream>
+#include <cmath>
+#include "Coordenada.h"
+
+using namespace std;
+
+Coordenada::Coordenada(double xx, double yy, double zz) : x(xx), y(yy), z(zz)
+{
+}
+
+double Coordenada::obtenerX()
+{
+	return x;
+}
+
+double Coordenada::obtenerY()
+{
+	return y;
+}
+
+double Coordenada::obtenerZ()
+{
+	return x;
+}
+---------------------------------------------------------------------------------------RECTANGULO.H
+#include <iostream>
+#include "Coordenada.h"
+
+using namespace std;
+
+class Rectangulo
+{
+	private:
+		Coordenada closeOrigin;
+		Coordenada farOrigin;
+	
+	public:
+		Rectangulo();
+		Rectangulo(double x1, double y1, double z1, double x2, double y2, double z2);
+		Rectangulo(Coordenada closeOrigin, Coordenada farOrigin);
+		void obtenerVertices();
+		Coordenada obtieneCloseOrigin();
+		Coordenada obtieneFarOrigin();
+		double obtieneArea();
+		double obtieneVol();
+};
+---------------------------------------------------------------------------------------RECTANGULO.CPP
+#include <iostream>
+#include "Rectangulo.h"
+
+using namespace std;
+
+Rectangulo::Rectangulo() : closeOrigin(0, 0, 0), farOrigin(0, 0, 0)
+{
+}
+
+Rectangulo::Rectangulo(double x1, double y1, double z1, double x2, double y2, double z2) : closeOrigin(x1, y1, z1), farOrigin(x2, y2, z2)
+{
+}
+
+Rectangulo::Rectangulo(Coordenada closeOriginn, Coordenada farOriginn) : closeOrigin(closeOriginn), farOrigin(farOriginn)
+{
+}
+
+double Rectangulo::obtieneArea()
+{
+	double alto = farOrigin.obtenerZ() - closeOrigin.obtenerZ();
+	double ancho = farOrigin.obtenerY() - closeOrigin.obtenerY();
+	double prof = farOrigin.obtenerX() - closeOrigin.obtenerX();
+
+	double areaBase = ancho * prof;
+	double perimetroBase = 2 * (ancho + prof);
+	double areaLateral = perimetroBase * alto;
+	double areaTotal = 2 * areaBase + areaLateral;
+
+	return areaTotal;
+} 
+
+double Rectangulo::obtieneVol()
+{
+	double alto = farOrigin.obtenerZ() - closeOrigin.obtenerZ();
+	double ancho = farOrigin.obtenerY() - closeOrigin.obtenerY();
+	double prof = farOrigin.obtenerX() - closeOrigin.obtenerX();
+
+	return alto * ancho * prof;
+}
+
+void Rectangulo::obtenerVertices()
+{
+	printf("Vertice 1: %lf %lf %lf\n", closeOrigin.obtenerX(), closeOrigin.obtenerY(),  closeOrigin.obtenerZ());
+	printf("Vertice 2: %lf %lf %lf\n", farOrigin.obtenerX(), farOrigin.obtenerY(),  farOrigin.obtenerZ());
+	printf("Vertice 3: %lf %lf %lf\n", closeOrigin.obtenerX(), closeOrigin.obtenerY(),  farOrigin.obtenerZ()); 
+	printf("Vertice 4: %lf %lf %lf\n", farOrigin.obtenerX(), farOrigin.obtenerY(),  closeOrigin.obtenerZ());   
+	printf("Vertice 5: %lf %lf %lf\n", farOrigin.obtenerX(), closeOrigin.obtenerY(),  closeOrigin.obtenerZ());
+	printf("Vertice 6: %lf %lf %lf\n", farOrigin.obtenerX(), closeOrigin.obtenerY(),  farOrigin.obtenerZ());
+	printf("Vertice 7: %lf %lf %lf\n", closeOrigin.obtenerX(), farOrigin.obtenerY(),  farOrigin.obtenerZ());
+	printf("Vertice 8: %lf %lf %lf\n", closeOrigin.obtenerX(), farOrigin.obtenerY(),  closeOrigin.obtenerZ());
+}
+
+Coordenada Rectangulo::obtieneCloseOrigin()
+{
+	return closeOrigin;
+}
+
+Coordenada Rectangulo::obtieneFarOrigin()
+{
+	return farOrigin;
+}
+---------------------------------------------------------------------------------------ORTOEDRO TEST
+#include <iostream>
+#include "Rectangulo.h"
+
+using namespace std;
+
+int main()
+{
+	Rectangulo rectangulo1(Coordenada(1, 2, 3), Coordenada(3, 11, 5));
+	
+	cout << "Calculando el área de un ortoedro dadas sus coordenadas en el espacio:\n";
+
+	rectangulo1.obtenerVertices();
+	cout << "\nEl área del ortoedro es = " << rectangulo1.obtieneArea() << "cm2" << endl;
+	cout << "El volumen del ortoedro es = " << rectangulo1.obtieneVol() << "cm3" << endl;
+
+	return 0;
+}
+									CRIBA DE ERATÓSTENES
+***************************************1.4.1*******************************************NUMBER.H
+#include <iostream>
+using namespace std;
+
+class Number
+{
+	private:
+		int num;
+		bool prime;
+
+	public:
+		Number(int num = 0, bool prime = true);
+		int getNum();
+		bool isPrime();
+		void setNum(int n);
+		void setPrime(bool p);
+};
+---------------------------------------------------------------------------------------NUMBER.CPP
+#include <iostream>
+#include <cmath>
+#include "Number.h"
+
+using namespace std;
+
+Number::Number(int n, bool p) : num(n), prime(p)
+{
+}
+
+int Number::getNum()
+{
+	return num;
+}
+
+void Number::setNum(int n)
+{
+	num = n;
+}
+
+bool Number::isPrime()
+{
+	return prime;
+}
+
+void Number::setPrime(bool p)
+{
+	prime = p;
+}
+---------------------------------------------------------------------------------------CRIBA
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime> //time
+#include <unistd.h>
+#include <string.h> //memcpy
+#include <vector>
+#include "Number.h"
+
+using namespace std;
+
+int main()
+{
+	vector<Number> numbers;
+	int n_limit, i;
+
+	cout << "Enter N: ";
+	cin >> n_limit;	
+
+	for(i = 0; i < n_limit; i++)
+	{
+		if(i == 0)
+		{
+			Number n(i + 1, false);
+			numbers.push_back(n);
+		}
+		else
+		{
+			Number n(i + 1, true);
+			numbers.push_back(n);
+		}
+		
+	}
+
+	int number = 2;
+	while((number * number) <= n_limit)
+	{
+		for(i = number; i < n_limit; i++)
+		{
+				if(numbers[i].isPrime())
+					if( (numbers[i].getNum() % number) == 0)
+						numbers[i].setPrime(false);	
+		}
+
+		for(i = number; i < n_limit; i++)
+		{
+			if(numbers[i].isPrime())
+			{
+				number = numbers[i].getNum();
+				break;
+			}
+		}
+	}
+
+	for(i = 0; i < n_limit; i++)
+	{
+		if(numbers[i].isPrime())
+			printf("%d ", numbers[i].getNum());
+	}
+	printf("\n");
+	
+	return 0;
+}

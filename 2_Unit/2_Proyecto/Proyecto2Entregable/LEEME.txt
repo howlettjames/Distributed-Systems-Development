@@ -1,0 +1,7 @@
+Bastida Prado Jaime Armando
+4CM4
+
+Instrucciones:
+- Para compilar el programa simplemente corra el comando "make" y se generará el ejecutable "animacion".
+- El programa recibe como parámetro el número de asteroides a graficar, para correrlo graficando 100 asteroides sería
+  con "./animacion 100".

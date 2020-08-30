@@ -1,0 +1,30 @@
+Las características de un sistema distribuido son:
+A. Concurrencia de componentes, no hay un reloj global, falla independiente de los componentes.
+B. Componentes no concurrentes, no hay un reloj global, falla independiente de los componentes.
+C. Concurrencia de componentes, hay un reloj global, falla independiente de los componentes.
+D. Componentes no concurrentes, hay un reloj global, falla dependiente de los componentes.
+
+La principal motivación en general para construir y usar un sistema distribuido proviene del deseo de:
+A. Compartir recursos.
+B. Incrementar la velocidad de cómputo.
+C. Enviar documentos a otras máquinas.
+D. Hacer más globalizado el mundo de la web.
+
+¿Cuál de estos no es un sistema distribuido?
+A. Linux.
+B. Gmail.
+C. Redes sociales.
+D. eCommerce. 
+
+El tipo de dato entero puede representarse de diferente forma en diferentes clases de hardware ¿Cuántas alternativas hay
+para ordenar los bytes en el caso de los enteros?
+A. 2.
+B. 3.
+C. 4.
+D. 5.
+
+La seguridad de los recursos de información tiene tres componentes, cual de los siguientes no lo es:
+A. Extensibilidad.
+B. Disponibilidad.
+c. Integridad.
+D. Confidencialidad.

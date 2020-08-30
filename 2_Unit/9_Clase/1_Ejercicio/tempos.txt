@@ -1,0 +1,3 @@
+Ejercicio 1A: 16.884s
+Ejercicio 1B: 5.361s
+Ejercicio 1C: 0.676s

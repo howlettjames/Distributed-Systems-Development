@@ -1,0 +1,24 @@
+Bastida Prado Jaime Armando
+4CM4
+
+Instrucciones para C++:
+- Para compilar el programa simplemente ejecute el comando "make", esto generará el ejecutable "generador"
+- Para ejecutar el programa simplemente haga "./generador".
+
+Instrucciones para Java:
+- Como esta tecnología ya no es soportada por las nuevas versiones de Java SDK, es posible que sea necesario que
+  descargue JavaFX SDK, para ello vaya a la liga: https://openjfx.io/openjfx-docs/#introduction, en la sección 
+  "Introcuction" viene la liga para descargarlo. No lo incluí yo en el .zip por pesar más de lo permitido para subir
+  en el moodle.
+- En esa misma liga en la sección "Run HelloWorld using JavaFX" viene como compilar y correr un programa en JavaFX,
+  a continuación yo le indico como correr específicamente mi programa:
+	- set PATH_TO_FX="path\to\javafx-sdk-14\lib" (aquí modifiqué la ruta a la ruta donde descargó JavaFX).
+	- javac --module-path %PATH_TO_FX% --add-modules javafx.controls,javafx.fxml Graficador.java
+	- java --module-path %PATH_TO_FX% --add-modules javafx.controls Graficador
+
+A continuación corra primero el programa en Java (Graficador) y luego el progama en C++(Generador).
+
+Nota: Tengo entendido por lo que un compañero me mencionó que la forma en la que usted tenía pensado el diseño de la aplicación era con Java Swing, 
+      pero como el tiempo de entrega se venía encima no tuve la oportunidad de aprender a graficar en esa herramienta,
+      es por eso que hice el programa en JavaFX pues ya estaba más familiarizado, eso me causó algunas dudas de la lógica acerca
+      de como implementar el programa.
