@@ -1,6 +1,6 @@
 # Distributed Systems Development
 
-### This repository contains practices and projects related to the subject Distributed Systems Programming at ESCOM - IPN.
+### This repository contains practices and projects related to the subject Distributed Systems Development at ESCOM - IPN.
 
 Some of the topics studied and implemented were:
 
